@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Otherside — Masterplan · PROPOSED v3 (Detonate)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://otherside-masterplan-preview.surge.sh/styles.css">
+<style>
+.dtr{grid-template-columns:1.4fr 1.6fr .8fr .8fr 1.4fr 76px 30px !important}
+.dtc{display:flex;align-items:center;justify-content:center;border-left:1px solid var(--line)}
+.dtc input{width:17px;height:17px;cursor:pointer;accent-color:var(--done)}
+.dtr.done .dtd{text-decoration:line-through;color:var(--mut2);opacity:.7}
+.v3flag{position:fixed;bottom:14px;right:14px;z-index:200;background:#3a1d12;border:1px solid #c0602e;color:#f2c9a8;font-size:12px;padding:8px 13px;border-radius:9px;max-width:280px;line-height:1.4}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><svg class="logomark" viewBox="0 0 60 56" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="23" r="13" stroke="var(--gold2)" stroke-width="2"/><line x1="3" y1="29" x2="57" y2="29" stroke="var(--gold2)" stroke-width="2" stroke-linecap="round"/><rect x="15" y="34" width="30" height="2.6" rx="1.3" fill="#F5831F"/><rect x="19" y="39" width="22" height="2.6" rx="1.3" fill="#F5831F"/><rect x="23" y="44" width="14" height="2.6" rx="1.3" fill="#F5831F"/><rect x="27" y="49" width="6" height="2.6" rx="1.3" fill="#F5831F"/></svg><span class="wm">OTHERSIDE</span><span class="brandsub">Masterplan · PROPOSED v3</span></div>
+  <div class="grow"></div>
+  <div class="who"><span>You:</span><input id="nameIn" placeholder="your name" autocomplete="off"></div>
+  <div class="sync"><span class="dot" id="syncDot"></span><span id="syncTxt">connecting…</span></div>
+</header>
+<nav id="tabs"></nav>
+<div class="wrap">
+  <main id="main"><div class="empty" style="padding:30px">Loading proposed v3…</div></main>
+  <aside>
+    <div class="feedbar"><div class="aside-h">Activity &amp; Memory</div><button id="feedToggle" class="feedtoggle" onclick="toggleFeed()" title="Collapse">&raquo;</button></div>
+    <div class="aside-sub">Every edit, status change &amp; comment — shared with everyone.</div>
+    <div class="feed" id="feed"><div class="empty">Loading…</div></div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<div class="v3flag"><b>PROPOSED v3 — review only.</b> Reworked around the Detonate pivot. Reads the live data but is <b>read-only</b> — the team still sees the current Overview. Nothing here is live.</div>
+<script src="https://otherside-masterplan-preview.surge.sh/app.js"></script>
+<script src="https://otherside-masterplan-preview.surge.sh/app2.js"></script>
+<script src="https://otherside-masterplan-preview.surge.sh/app3.js"></script>
+<script src="https://otherside-masterplan-preview.surge.sh/app4.js"></script>
+<script>
+(function(){
+  /* ---- base patches (same as the live app) ---- */
+  try{var tb=document.getElementById('tabs');Array.prototype.slice.call(tb.children).forEach(function(b){if(b.dataset&&b.dataset.id==='proposed')b.remove();});}catch(e){}
+  window.renderMain=function(){ EDITING=false; NS='prop'; document.body.classList.toggle('ov', CURRENT==='overview'); if(CURRENT==='departments') return renderDepartments(); return renderOverview(); };
+
+  /* ---- READ-ONLY: block every write so this review copy can't touch live data ---- */
+  window.updateRow=async function(){ toast('Review copy — editing is disabled here'); return []; };
+  window.insertRow=async function(){ toast('Review copy — editing is disabled here'); return []; };
+  window.upsertRow=async function(){ toast('Review copy — editing is disabled here'); return []; };
+  window.delRow=async function(){ toast('Review copy — editing is disabled here'); return []; };
+  window.logAct=async function(){ return; };
+
+  /* ---- Change 1 carried over: Done column on dept strategy tables ---- */
+  window.renderDept=function(id){
+    var d=dDepts().find(function(x){return x.id===id;}); if(!d){DEPT=null;return renderDepartments();}
+    var rows=dDrows().filter(function(r){return r.dept_id===id;});
+    var h='<div class="deptpage">';
+    h+='<div class="crumbbar"><div class="crumb"><a onclick="goOverview()">Overview</a><span class="sep">&rsaquo;</span><a onclick="backDepts()">Departments</a><span class="sep">&rsaquo;</span><span class="cur">'+esc(d.name)+'</span></div></div>';
+    h+='<div class="depthead"><span>'+esc(d.name)+'</span> Department</div>';
+    h+=ladderBlock(d);
+    h+=secBlock(id,'services','Services provided to the business');
+    h+=secBlock(id,'goals','Strategic Goals and Objectives');
+    h+='<div class="dept2col">'+secBlock(id,'kpis','Reportable KPIs')+secBlock(id,'resources','Resources')+'</div>';
+    h+='<div class="sech">Strategy table</div>';
+    h+='<div class="dtable"><div class="dtr dthead"><div>Strategy</div><div>Activity</div><div>Owner</div><div>Target Date</div><div>KPI</div><div>Done</div><div></div></div>';
+    rows.forEach(function(r){
+      h+='<div class="dtr'+(r.complete?' done':'')+'">'+dcell(r.id,'strategy')+dcell(r.id,'activity')+dcell(r.id,'owner')+dcell(r.id,'target_date')+dcell(r.id,'kpi')+
+      '<div class="dtc"><input type="checkbox"'+(r.complete?' checked':'')+' disabled></div><div class="dtx"></div></div>';
+    });
+    if(!rows.length)h+='<div class="dtr"><div class="dtd" style="grid-column:1/8"><span class="dempty">No rows yet.</span></div></div>';
+    h+='</div></div>';
+    document.getElementById('main').innerHTML=h;
+  };
+
+  /* ---- v3 framing: Detonate targets, principles, sequence (hardcoded strip) ---- */
+  window.framingStrips=function(){
+    var PRIN=[
+      ['P1','Outcomes, not activity','KPIs and KRs pull toward the objective. Enforced scorecards + Rocks — not attendance-style base metrics.'],
+      ['P2','Own economics end to end','Net + gross cost per sale, CAC by product, blended ROAS through to Reborn, contracted-vs-collected, BNPL.'],
+      ['P3','AI + operating-tool foundation','Now live in-product (Demasking Chat, Detonate AI). AI augments delivery so Adeyemi is extracted without losing soul.'],
+      ['P4','Product-led growth','Every department carries a sales metric. Detonate → Reborn ascension is the growth engine, not a launch spike.'],
+      ['P5','Deposit before we extract','Front-end is "extremely vanilla"; the deposit is the 14-day container + audience. Quality of man over volume.']
+    ];
+    var TGT=[
+      ['Detonate (front door)','$197 (VIP upsell) · doors <b>Aug 17</b> · live <b>Sep 1</b> · evergreen, rolling starts'],
+      ['Evergreen floor','$200–300K/mo recurring · near-term $100–150K → launch window $180–250K'],
+      ['2027 target','$300–400K/mo'],
+      ['Reborn (the engine)','~$10K · staggered monthly cohorts · onboard mid-Sep, start <b>Oct</b> · ~30 men ascend/mo'],
+      ['The ladder','Detonate $197 → VIP → Accelerant $97 → Signature Decode $397–500 → Reborn · <i>Chrysalis ~$5K gap-fill floated</i>'],
+      ['Conversion','Front-end CVR 2–4% · CAC $60–100 · <b>Detonate→Reborn 4–8%</b> (base 5%) · blended ROAS ≥5x to scale'],
+      ['In-person Erupt','Nov <b>failsafe</b>, $297–497, fast-path to Reborn · <i>skip entirely if Detonate ≥$200–250K/mo</i>'],
+      ['Brotherhood','Separate entity · $5M/yr · not in the funnel · launches once Detonate/Reborn are stable']
+    ];
+    var ACT=['Gate 0 scoping (Jul 30)','Name-test verdict (Aug 6)','<b>Doors open — ads live (Aug 17)</b>','Mainly live / V2 kickoff (Sep 1)','First Reborn cohort (Oct)'];
+    var PAS=['In-person Erupt — Nov failsafe (skip if Detonate ≥$200–250K/mo)','December "new year, new me" revenue ramp','Brotherhood — when Detonate/Reborn are stable'];
+    var h='<div class="propbanner"><span class="propbadge">PROPOSED v3 · DETONATE</span><span>Reworked around the Jul 13 <b>“cycle to scale”</b> pivot: the Sept in-person Erupt is cancelled and replaced by <b>Detonate</b> (evergreen $197 digital Erupt). This is a <b>review copy</b> — not live. <i>Open decision: Detonate as standalone front door vs “Erupt on Demand” sub-brand (Jul 24).</i></span></div>';
+    h+='<div class="sech2">Operating Principles</div><div class="propsub">Adeyemi’s five themes — still the law, now with AI (P3) and the deposit (P5) central to Detonate.</div><div class="pgrid">';
+    PRIN.forEach(function(p){h+='<div class="pcard"><span class="pn2">'+p[0]+'</span><div class="pct">'+p[1]+'</div><div class="pcb">'+p[2]+'</div></div>';});
+    h+='</div>';
+    h+='<div class="sech2">2026 Targets</div><div class="targetgrid">';
+    TGT.forEach(function(t){h+='<div class="tchip"><div class="tk">'+t[0]+'</div><div class="tv">'+t[1]+'</div></div>';});
+    h+='</div>';
+    h+='<div class="sech2">Sequence</div><div class="seqgrid"><div class="seqcol"><div class="seqh">Active</div><ul>'+ACT.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div><div class="seqcol"><div class="seqh">Failsafe / Watch</div><ul>'+PAS.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div></div>';
+    h+='<div class="sech2">The plan, reframed</div><div class="propsub">Goal and the four pillars below are reworked for Detonate. <b>Lane cells and department tables still show the pre-pivot content</b> — those are the next pass once you approve the direction.</div>';
+    return h;
+  };
+
+  /* ---- overlay the reworked goal + 4 pillars in memory (display only) ---- */
+  function applyV3Overlay(){
+    if(!PGOALS||!PGOALS.length)return;
+    PGOALS[0].title='Hit the H2 Revenue Floor while Scaling Soul';
+    PGOALS[0].target='Evergreen floor $200–300K/mo (→ $300–400K in 2027) · Detonate + monthly Reborn · burn the boats';
+    var P=[
+      ['Build the evergreen floor','Launch &amp; scale Detonate ($197 + VIP) to a $200–300K/mo recurring floor. Near-term $100–150K, launch window $180–250K.'],
+      ['Extract the founder','Detonate + AI run delivery without Adeyemi. Coaches → 2–3; Edward sole closer; Roberto → Head of Transformation &amp; Product.'],
+      ['Launch &amp; prove Detonate','Doors Aug 17 · live Sep 1 · first Reborn cohort Oct. In-person Erupt = Nov failsafe only (skip if Detonate ≥$200–250K/mo).'],
+      ['Fix the conversion levers','Front-end CVR 2–4% / CAC $60–100 AND the real bet: Detonate→Reborn ascension (~30 men/mo, 4–8%). Blended ROAS is the metric.']
+    ];
+    for(var i=1;i<PGOALS.length && (i-1)<P.length;i++){ PGOALS[i].title=P[i-1][0]; PGOALS[i].target=P[i-1][1]; }
+    if(PGOALS[0]) PGOALS[0].progress = PGOALS[0].progress;
+  }
+
+  var _load=window.load;
+  window.load=async function(){ await _load(); try{applyV3Overlay();}catch(e){} try{renderMain();renderFeed();}catch(e){} };
+
+  try{ CURRENT='overview'; renderTabs(); load(); }catch(e){}
+})();
+</script>
+</body>
+</html>
