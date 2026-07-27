@@ -104,23 +104,174 @@
     return h;
   };
 
-  /* ---- overlay the reworked goal + 4 pillars in memory (display only) ---- */
-  function applyV3Overlay(){
-    if(!PGOALS||!PGOALS.length)return;
-    PGOALS[0].title='Hit the H2 Revenue Floor while Scaling Soul';
-    PGOALS[0].target='Evergreen floor $200–300K/mo (→ $300–400K in 2027) · Detonate + monthly Reborn · burn the boats';
+  /* ---- overlay the reworked goal + 4 pillars on EVERY render (display only, never mutates live data) ---- */
+  window.dGoals=function(){
+    var base=(NS==='prop'?PGOALS:GOALS)||[];
+    if(!base.length) return base;
+    var g=base.map(function(x){return Object.assign({},x);});
+    g[0].title='Hit the H2 Revenue Floor while Scaling Soul';
+    g[0].target='Evergreen floor $200–300K/mo (→ $300–400K in 2027) · Detonate + monthly Reborn · burn the boats';
     var P=[
-      ['Build the evergreen floor','Launch &amp; scale Detonate ($197 + VIP) to a $200–300K/mo recurring floor. Near-term $100–150K, launch window $180–250K.'],
-      ['Extract the founder','Detonate + AI run delivery without Adeyemi. Coaches → 2–3; Edward sole closer; Roberto → Head of Transformation &amp; Product.'],
-      ['Launch &amp; prove Detonate','Doors Aug 17 · live Sep 1 · first Reborn cohort Oct. In-person Erupt = Nov failsafe only (skip if Detonate ≥$200–250K/mo).'],
-      ['Fix the conversion levers','Front-end CVR 2–4% / CAC $60–100 AND the real bet: Detonate→Reborn ascension (~30 men/mo, 4–8%). Blended ROAS is the metric.']
+      ['Build the evergreen floor','Launch & scale Detonate ($197 + VIP) to a $200–300K/mo recurring floor. Near-term $100–150K, launch window $180–250K.'],
+      ['Extract the founder','Detonate + AI run delivery without Adeyemi. Coaches → 2–3; Edward sole closer; Roberto → Head of Transformation & Product.'],
+      ['Launch and prove Detonate','Doors Aug 17 · live Sep 1 · first Reborn cohort Oct. In-person Erupt = Nov failsafe only (skip if Detonate ≥ $200–250K/mo).'],
+      ['Fix the conversion levers','Front-end CVR 2–4% / CAC $60–100 AND the real bet: Detonate → Reborn ascension (~30 men/mo, 4–8%). Blended ROAS is the metric.']
     ];
-    for(var i=1;i<PGOALS.length && (i-1)<P.length;i++){ PGOALS[i].title=P[i-1][0]; PGOALS[i].target=P[i-1][1]; }
-    if(PGOALS[0]) PGOALS[0].progress = PGOALS[0].progress;
-  }
+    for(var i=1;i<g.length&&(i-1)<P.length;i++){ g[i].title=P[i-1][0]; g[i].target=P[i-1][1]; }
+    return g;
+  };
 
-  var _load=window.load;
-  window.load=async function(){ await _load(); try{applyV3Overlay();}catch(e){} try{renderMain();renderFeed();}catch(e){} };
+  /* ---- overlay the reworked lane cells (Strategy/Ops/Marketing/Brand/Delivery/Metrics × 4 pillars) ---- */
+  var NEWCELLS=[
+   {
+    strategy:'<b>Decide &amp; lock the evergreen offer:</b> Detonate is the always-on product that pays the team without launches. Lock price ($197, A/B vs $97), the ladder (Detonate &rarr; VIP $197 &rarr; Accelerant $97 &rarr; Signature Decode $397&ndash;500 &rarr; Reborn), and who delivers it without Adeyemi. Target: <b>$200&ndash;300K/mo</b> recurring floor.',
+    operations:'<b>Operations:</b> Build the Detonate container &mdash; data-spine schema, purchase-day automation (rolling starts), Telegram broadcast-only, wins-and-reflections gate, enforcement (strikes / scars / cut + 60&ndash;90-day lockout).<br><b>Sales:</b> Always-on ascension pipeline &mdash; application is the commitment line, priority queue, closer&rsquo;s dossier.<br><b>Finance:</b> Payment-plan tracking; monthly revenue vs the $200&ndash;300K floor; front-end (self-liquidating) vs Reborn P&amp;L split. <b>Rebuild the H2 budget</b> (predates the pivot).',
+    marketing:'Lead-magnet / funnel spine for Detonate &mdash; front end is &ldquo;extremely vanilla&rdquo;; the quiz is <b>onboarding step 1 inside the product</b>, not a free front-end magnet. Evergreen email spine; always-on ad angles v1. Runs on <b>Marketing V2 (ClickUp)</b> &mdash; Detonate = a campaign record.',
+    content:'Deposit into the audience so the evergreen funnel converts warm demand. <b>5&ndash;10&times; content jump &rarr; ~100 pieces/week</b>; trial reels (B-roll + text to non-audience); daily &ldquo;top of the morning&rdquo; vlog; free + gated content.',
+    delivery:'TS team (now <b>2&ndash;3 coaches</b>) + AI deliver the Detonate 14-day container and the monthly Reborn cohort without Adeyemi; capacity scales with enrolments (cap = coaches &times; 20).',
+    metrics:'Detonate purchases/wk &middot; front-end <b>CVR 2&ndash;4%</b> &middot; CAC $60&ndash;100 &middot; evergreen monthly revenue vs the $200&ndash;300K floor &middot; AOV $788&ndash;1,000 &middot; completion &amp; day-10 application rate.'
+   },
+   {
+    strategy:'<b>Narrow Adeyemi to:</b> content, vision, brand, in-person. Everything else systematised or AI-augmented. Coach team &rarr; 2&ndash;3; <b>Roberto &rarr; Head of Transformation &amp; Product.</b>',
+    operations:'<b>Operations:</b> Operating rhythm on <b>ClickUp</b> (exec layer) with Notion as CMS only; SOPs &amp; doc control; # of decisions escalated to Adeyemi as a KPI (reduce).<br><b>Sales:</b> Edward = single monthly closer; ascension mechanics documented so closing doesn&rsquo;t depend on Adeyemi.<br><b>Finance:</b> Approvals matrix + budget authority so fewer decisions fall on Adeyemi.',
+    marketing:'Systematise the founder voice &amp; brand so content ships daily without Adeyemi. <b>Voice Law = CONTRAST</b>; one reconciled voice bible; mine <b>ERUPT 2 (the spine)</b> + the corpus.',
+    content:'One reconciled voice bible + an owned show; brand content ships daily without Adeyemi beyond presence/delivery. Documentary / build-in-public lane (credibility = what he has <i>built</i>, not just coaching).',
+    delivery:'Roberto + coaches own Reborn end-to-end; Adeyemi only where brand-critical, not day-to-day. <b>AI augments delivery, never replaces</b> (Demasking Chat, Detonate AI).',
+    metrics:'% of delivery without Adeyemi &middot; # decisions escalated to Adeyemi (reduce) &middot; voice bible live &middot; content cadence (~100/wk) &middot; coach count held at 2&ndash;3.'
+   },
+   {
+    strategy:'<b>Gate 0 scoping by Jul 30</b> (zero descope). Name test &rarr; verdict Aug 6. <b>Doors Aug 17</b>, mainly live Sep 1. Open decision: standalone Detonate vs &ldquo;Erupt on Demand&rdquo; sub-brand.',
+    operations:'<b>Operations:</b> Gate 0 locks V1 scope + &sect;9.5 product checks + data-spine schema. Dry run Aug 13&ndash;15, freeze Aug 15, <b>doors Aug 17</b>. At doors only Ignition + Days 1&ndash;7 final; D8&ndash;14 + ascension buffer to ~Aug 24&ndash;30.<br><b>Sales:</b> First Reborn cohort onboard mid-Sep, start Oct; cap coaches &times; 20; gatekeep bad-fit under evergreen volume.<br><b>Finance:</b> Ad spend &mdash; test $10&ndash;20k (Aug 17&ndash;Sep 5) &rarr; $30&ndash;50k/mo (Sept); cash-collected vs contracted; refund rate.',
+    marketing:'<b>Launch Detonate:</b> name-test ads live by Jul 30 (Meta weapons-classifier risk &mdash; no public name until ads clear); <b>price A/B ($197 vs $97)</b> with strict tracking + dashboard; sales page + checkout ladder (Voice-Law checklist); <b>bedroom-to-boardroom leads the campaign.</b>',
+    content:'Pre-sell Detonate with story-led brand + proof. Content shelves: <b>ERUPT 2 spine</b>, ERUPT 1 / Penetrate vault, Reborn ascension-proof cuts, and the <b>Testimonial Mine</b>. Build the IG / YouTube / email web.',
+    delivery:'Onboard / train the lean coach team ahead of the Oct cohort; Detonate enforcement live (mountains / valleys, strikes, cut + <b>return-letter</b> re-entry pipeline).',
+    metrics:'Detonate registrations &amp; completions &middot; ascension application rate &middot; first Reborn cohort size (Oct) &middot; ad spend vs plan.'
+   },
+   {
+    strategy:'Make <b>Detonate &rarr; Reborn ascension</b> (the real money lever) the single most important number; front-end CVR is the leading indicator. Validate ascension at the <b>Oct cohort</b>.',
+    operations:'<b>Operations:</b> Tooling / automations / integrations (GHL, checkout, AI surfaces). Tracking clean before any paid restart.<br><b>Sales:</b> Detonate&rarr;Reborn call close rate = downstream measure conversion is working; application rate = the primary signal.<br><b>Finance:</b> CAC vs LTV by rung; <b>blended ROAS &ge;5&times; to scale</b>; failed-payment %.',
+    marketing:'Front-end <b>CVR 2&ndash;4% / CAC $60&ndash;100</b>. Spiral doctrine (Orange-mastery + hidden Red, zero Green leak); objection map; the tether mechanism. Pair CVR with a <b>lead-quality target</b> &mdash; per-rung ICP (the $197 Detonate buyer &ne; the Reborn buyer).',
+    content:'Message-to-market fit so leads arrive pre-sold; <b>engagement rate over follower count</b>; every feed pushes cleaner traffic to the Detonate front door.',
+    delivery:'Tighten the Detonate &rarr; Reborn handoff + proof capture (testimonials / NPS) so delivery quality feeds ascension. The closer&rsquo;s dossier &mdash; <b>&ldquo;being SEEN is the pitch.&rdquo;</b>',
+    metrics:'<b>Detonate &rarr; Reborn 4&ndash;8%</b> (base 5%) &middot; blended ROAS (&ge;5&times;) &middot; failed-payment % &middot; CAC vs LTV by rung &middot; A/B results clean.'
+   }
+  ];
+  window.dContrib=function(){
+    var goals=(NS==='prop'?PGOALS:GOALS)||[];
+    var pillars=goals.slice(1);
+    var out=[];
+    for(var pi=0; pi<pillars.length && pi<NEWCELLS.length; pi++){
+      var cell=NEWCELLS[pi];
+      for(var area in cell){ if(cell[area]) out.push({goal_id:pillars[pi].id, area:area, body:cell[area]}); }
+    }
+    return out;
+  };
+
+  /* ---- overlay the reworked department one-pagers (keeps originals for any dept not listed) ---- */
+  var DEPTOVER={
+   'Marketing':{
+     services:'<ul><li>Detonate campaign marketing, run on <b>Marketing V2 (ClickUp)</b> — Detonate = a campaign record</li><li>Paid acquisition (Meta): name-safe creative + the price A/B</li><li>Evergreen email spine &amp; lifecycle</li><li>Sales page + checkout ladder (Voice-Law checklist)</li><li>Conversion / CRO across the ladder</li><li>Reporting, attribution &amp; the marketing scorecard</li></ul>',
+     goals:'<ul><li>Launch Detonate and hold the <b>$200–300K/mo</b> evergreen floor</li><li>Front-end CVR that feeds Reborn ascension (the real revenue)</li><li>Systematise the founder voice so content runs without Adeyemi</li></ul>',
+     kpis:'<ul><li>Detonate front-end CVR <b>2–4%</b> / CAC $60–100</li><li>Detonate→Reborn application rate</li><li>Name-test verdict (Aug 6) · price A/B winner</li><li>Content cadence ~100/wk</li></ul>',
+     resources:'<ul><li>GHL, Meta, Make, <b>ClickUp (Marketing V2)</b>, Webflow, Circle, Canva/Adobe/Frame</li><li>340k followers · 2M+ downloads · ~35k list</li><li>ERUPT 2 spine + 357-recording corpus + Testimonial Mine</li></ul>',
+     rows:[
+       {strategy:'Detonate name-test ads',activity:'7-day Meta name test (weapons-classifier risk); fallback = name on page, pattern interrupt in creative',owner:'Will',target_date:'By Jul 30 → verdict Aug 6',kpi:'Name clears Meta / fallback ready'},
+       {strategy:'Price A/B ($197 vs $97)',activity:'Strict tracking + dashboard, judged full-funnel (AOV / completion / cost-per-Reborn-close)',owner:'Will / Oliver',target_date:'Doors Aug 17',kpi:'Winner chosen; dashboard live'},
+       {strategy:'Sales page + checkout ladder',activity:'Voice-Law checklist; bedroom-to-boardroom leads; ladder wired',owner:'Will / Sasha / Ryan',target_date:'Pre-doors',kpi:'CVR 2–4%'},
+       {strategy:'Evergreen email + ad angles v1',activity:'Lifecycle spine + always-on angles; per-rung ICP',owner:'Will / Ryan',target_date:'Sept',kpi:'CAC $60–100'}
+     ]
+   },
+   'Sales & Pipeline':{
+     services:'<ul><li>Detonate→Reborn ascension pipeline (application = the commitment line, priority queue)</li><li>Reborn close calls (Edward)</li><li>Closer&rsquo;s dossier / enforcement / wall-letter as sales weapons</li><li>Gatekeeping bad-fit under evergreen volume</li><li>Payment plans &amp; deposits</li></ul>',
+     goals:'<ul><li>Convert Detonate ascenders into monthly Reborn cohorts (cap = coaches × 20)</li><li>Edward = a self-sustaining single monthly closer</li><li>Protect fit; validate the <b>4–8% ascension</b> at the Oct cohort</li></ul>',
+     kpis:'<ul><li>Detonate→Reborn application rate</li><li>Close rate on Reborn calls · show rate</li><li>Monthly cohort size · refund/deposit rate</li><li>% closed without Adeyemi</li></ul>',
+     resources:'<ul><li>Edward Bertsch — sole monthly closer (~$15–20k/mo)</li><li>GHL pipelines; Slack rooms; Stripe / PayPal / Wise</li><li>The closer&rsquo;s dossier — enforcement · wall-letter · quiz/AI data</li></ul>',
+     rows:[
+       {strategy:'Stand up the ascension pipeline',activity:'Application → priority queue → booked call → close; document it',owner:'Edward / Oliver',target_date:'By Oct cohort',kpi:'Application→enrol tracked'},
+       {strategy:'Closer dossier + weapons live',activity:'Enforcement, wall-letter, dossier, quiz/AI data on every call',owner:'Edward',target_date:'Doors → Oct',kpi:'Used on 100% of calls'},
+       {strategy:'Validate Detonate→Reborn %',activity:'Measure actual ascension vs the 4–8% planning band',owner:'Edward / Will',target_date:'Oct checkpoint',kpi:'Actual vs 4–8%'}
+     ]
+   },
+   'Operations':{
+     services:'<ul><li>Company OS on <b>ClickUp</b> (exec layer), Notion = CMS</li><li>Detonate build coordination (Gate 0, data-spine, dry run)</li><li>Operating rhythm; onboarding; payments; SOPs</li></ul>',
+     goals:'<ul><li>Detonate live on a clean, documented OS by <b>doors Aug 17</b></li><li>Founder extracted from operational decisions</li><li># of decisions escalated to Adeyemi trending down</li></ul>',
+     kpis:'<ul><li>Gate 0 done (Jul 30)</li><li>ClickUp cutover (Aug 8) + adoption</li><li>Dry-run / freeze / doors hit on time</li><li>% decisions escalated to Adeyemi (reduce)</li></ul>',
+     resources:'<ul><li>Oliver Wolf (Head of Ops) + King (systems)</li><li>ClickUp, Notion (CMS), GoHighLevel, Make.com, Slack</li></ul>',
+     rows:[
+       {strategy:'Gate 0 scoping (zero descope)',activity:'Lock V1 scope, §9.5 product checks in writing, data-spine schema',owner:'Oliver / King / Roberto',target_date:'Wed Jul 30',kpi:'Scope + spine locked'},
+       {strategy:'ClickUp cutover',activity:'Drain old Marketing space; cut over to Marketing V2; Notion = CMS',owner:'Oliver / Will',target_date:'Fri Aug 8',kpi:'Team on ClickUp'},
+       {strategy:'Doors readiness',activity:'Dry run Aug 13–15, freeze Aug 15',owner:'Oliver',target_date:'Aug 13–17',kpi:'Doors open on time'}
+     ]
+   },
+   'Transformation & Delivery':{
+     services:'<ul><li>Detonate 14-day container delivery (automated + AI-augmented)</li><li>Monthly Reborn cohort delivery (lean pods)</li><li>Enforcement (mountains/valleys, cut + return-letter)</li><li>Proof capture; retreat support</li></ul>',
+     goals:'<ul><li>Deliver Detonate + monthly Reborn without Adeyemi (2–3 coaches)</li><li>Build ascension proof (Testimonial Mine)</li><li>Reborn 1.1 mapped &amp; implemented without Adeyemi</li></ul>',
+     kpis:'<ul><li>Detonate completion rate (~50% filter expected)</li><li>Reborn outcome rate · NPS · testimonial capture</li><li>Cohort attendance · coach form submission</li></ul>',
+     resources:'<ul><li>Roberto — Head of Transformation &amp; Product + 2–3 coaches (Samson, maybe Sandro)</li><li>Circle / Zoom / Fathom; 7-page intake; Reborn Playbook</li><li>AI surfaces (Demasking Chat, Detonate AI)</li></ul>',
+     rows:[
+       {strategy:'Detonate container delivery live',activity:'Enforcement + gate + Telegram broadcast running',owner:'Roberto',target_date:'Doors Aug 17',kpi:'Completion tracked'},
+       {strategy:'First Reborn cohort (Oct)',activity:'Onboard mid-Sep, start Oct; cap coaches × 20',owner:'Roberto',target_date:'Oct',kpi:'Cohort delivered'},
+       {strategy:'Reborn 1.1 mapped without Adeyemi',activity:'Coaches run pods end-to-end; SOPs',owner:'Roberto',target_date:'Q3',kpi:'Playbook implemented'}
+     ]
+   },
+   'Content & Creative':{
+     services:'<ul><li>~100 pieces/week content engine (5–10×)</li><li>Trial reels (B-roll → non-audience); daily vlog</li><li>Documentary / build-in-public lane</li><li>Copy (Ryan leads Detonate); mine ERUPT 2 spine + corpus + Testimonial Mine</li></ul>',
+     goals:'<ul><li>Deposit into the audience (front-end &ldquo;vanilla&rdquo;; edge in deeper containers)</li><li>Systematise the founder voice (Voice Law CONTRAST)</li><li>Build the IG / YouTube / email web pre-selling Detonate</li></ul>',
+     kpis:'<ul><li>~100 pieces/week · trial-reel win rate</li><li>Engagement rate (not follower count)</li><li>YouTube shipped · produced vs scheduled</li></ul>',
+     resources:'<ul><li>Ryan (Detonate copy), Kendall (hooks/captions), Malcolm (interviews/social), Sayf + editors</li><li>Videographer (high-priority hire)</li><li>Frame.io / Edits / Vimeo; ERUPT 2 spine + corpus; Voice bible</li></ul>',
+     rows:[
+       {strategy:'Stand up the 100/wk engine',activity:'B-roll ~8/day → trial reels; pulse winners',owner:'Will / Malcolm / Kendall',target_date:'Aug',kpi:'~100 pieces/wk'},
+       {strategy:'Reconcile the voice bible (CONTRAST)',activity:'Merge taxonomies into one source of truth',owner:'Will / Ryan',target_date:'Q3',kpi:'Single voice guide live'},
+       {strategy:'Documentary / build-in-public lane',activity:'Credibility = what he has built',owner:'Will / Malcolm',target_date:'Ongoing',kpi:'Cadence held'}
+     ]
+   },
+   'Tech & Systems':{
+     services:'<ul><li>Detonate build: data-spine schema, purchase-day automation, Telegram broadcast, wins-gate</li><li>AI surfaces (Demasking Chat, Detonate AI, Signature Decode AI)</li><li>GHL checkout / ladder; Make; Meta pixel / CAPI; dashboards</li></ul>',
+     goals:'<ul><li>Reliable Detonate checkout + tracking before paid</li><li>Data-spine + automation anchored to purchase day (zero descope)</li><li>AI surfaces live for V1</li></ul>',
+     kpis:'<ul><li>EMQ 8+ · checkout reliability · CAPI firing</li><li>AI surfaces live (Demasking / Detonate AI)</li><li>Price-A/B dashboard live</li></ul>',
+     resources:'<ul><li>King (systems / automations) + Sasha (web)</li><li>GHL, Make, Meta, Webflow, Stripe / PayPal, Looker, Minter</li></ul>',
+     rows:[
+       {strategy:'Detonate data-spine + automation',activity:'Purchase-day automation, rolling starts, Telegram broadcast',owner:'King',target_date:'Gate 0 → doors',kpi:'Automation live, zero descope'},
+       {strategy:'AI surfaces V1',activity:'Demasking Chat + Detonate AI (not Reborn-aware)',owner:'King',target_date:'Doors',kpi:'Surfaces live'},
+       {strategy:'Tracking + checkout clean',activity:'EMQ remediation, CAPI, checkout QA',owner:'King / Sasha',target_date:'Before paid',kpi:'EMQ 8+, events firing'}
+     ]
+   },
+   'Finance':{
+     services:'<ul><li>Rebuild the H2 budget (post-pivot)</li><li>Ad-spend tracking + ramp</li><li>Unit economics by rung (Detonate / VIP / Reborn)</li><li>Reconciliation; payment plans; reporting</li></ul>',
+     goals:'<ul><li>One source of truth for revenue</li><li>Fund the lean team via the evergreen floor</li><li>Blended CAC/LTV + ROAS to make scale decisions</li></ul>',
+     kpis:'<ul><li>Monthly revenue vs the <b>$200–300K</b> floor</li><li>Blended ROAS (≥5× to scale)</li><li>Front-end vs Reborn P&amp;L · CAC vs LTV by rung · failed-payment %</li></ul>',
+     resources:'<ul><li>Krizza (bookkeeper) + Oliver (approvals / model)</li><li>Stripe / PayPal / Wise / GHL</li><li>Team cost lower (2–3 coaches); ad budget test → scale</li></ul>',
+     rows:[
+       {strategy:'Rebuild the H2 budget (post-pivot)',activity:'Model Detonate + Reborn ascension; retire Erupt-launch revenue lines',owner:'Oliver / Krizza',target_date:'By doors',kpi:'New model live'},
+       {strategy:'Ad-spend ramp + ROAS dashboard',activity:'Test $10–20k → $30–50k/mo; blended ROAS gate ≥5×',owner:'Oliver / Will',target_date:'Aug–Oct',kpi:'ROAS tracked'},
+       {strategy:'Unit economics by rung',activity:'CAC/LTV per rung (Detonate/VIP/Reborn)',owner:'Oliver',target_date:'Q3',kpi:'Dashboard live'}
+     ]
+   }
+  };
+  window.dDsec=function(){
+    var deps=(NS==='prop'?PDEPTS:DEPTS)||[];
+    var base=((NS==='prop'?PDSEC:DSEC)||[]).map(function(x){return Object.assign({},x);});
+    deps.forEach(function(d){
+      var ov=DEPTOVER[d.name]; if(!ov)return;
+      ['services','goals','kpis','resources'].forEach(function(sk){
+        if(ov[sk]==null)return;
+        var f=base.find(function(r){return r.dept_id===d.id&&r.skey===sk;});
+        if(f){f.body=ov[sk];} else {base.push({dept_id:d.id,skey:sk,body:ov[sk]});}
+      });
+    });
+    return base;
+  };
+  window.dDrows=function(){
+    var deps=(NS==='prop'?PDEPTS:DEPTS)||[];
+    var base=(NS==='prop'?PDROWS:DROWS)||[];
+    var out=[];
+    deps.forEach(function(d){
+      var ov=DEPTOVER[d.name];
+      if(ov&&ov.rows){ ov.rows.forEach(function(r,ri){ out.push(Object.assign({id:'v3-'+d.id+'-'+ri,dept_id:d.id,sort:ri,complete:false},r)); }); }
+      else { base.filter(function(x){return x.dept_id===d.id;}).forEach(function(x){ out.push(x); }); }
+    });
+    return out;
+  };
 
   try{ CURRENT='overview'; renderTabs(); load(); }catch(e){}
 })();
