@@ -43,6 +43,13 @@
      NS stays 'prop' so we get the 6-lane layout + framing; tbl() + load() are repointed to the base tables. */
 
   window.tbl=function(n){return n;};                 // write to the base (orphaned) tables
+  /* dedicated v3 data — the base app can reload the team's p_* data into PGOALS all it likes; these getters ignore it */
+  var V3G=[],V3C=[],V3D=[],V3S=[],V3R=[];
+  window.dGoals=function(){return V3G;};
+  window.dContrib=function(){return V3C;};
+  window.dDepts=function(){return V3D;};
+  window.dDsec=function(){return V3S;};
+  window.dDrows=function(){return V3R;};
   try{var tb=document.getElementById('tabs');Array.prototype.slice.call(tb.children).forEach(function(b){if(b.dataset&&b.dataset.id==='proposed')b.remove();});}catch(e){}
   window.renderMain=function(){ EDITING=false; NS='prop'; document.body.classList.toggle('ov', CURRENT==='overview'); if(CURRENT==='departments') return renderDepartments(); return renderOverview(); };
 
@@ -117,7 +124,7 @@
         getRows('dept_rows','select=*&order=sort'),
         getRows('activity','select=*&order=created_at.desc&limit=40')
       ]);
-      PGOALS=res[0];PCONTRIB=res[1];PDEPTS=res[2];PDSEC=res[3];PDROWS=res[4];ACT=res[5];
+      V3G=res[0];V3C=res[1];V3D=res[2];V3S=res[3];V3R=res[4];ACT=res[5];
       if(EDITING)return;
       renderMain();renderFeed();
       document.getElementById('syncDot').classList.remove('err');
